@@ -1,38 +1,24 @@
 /* globals jQuery, $, waitForKeyElements */
 
-/*
-Implement this into the subtract listener
-Need best way to pass the stored count around
-if (storedCount != undefined && storedCount.length != 0) {JSON.stringify()}
-*/
-
 console.log(JSON.parse(localStorage.getItem("skedCount")));
 
-let counter = 0;
-let datestr = new Date().toDateString();
+let counter;
+const datestr = new Date().toDateString(); // Use datestr for key
 
 // Stored array of objects with `datestr` as keys
-let storedCountArr = JSON.parse(localStorage.getItem("skedCount")) || [];
+let countDataArray = JSON.parse(localStorage.getItem("skedCount")) || [
+  { [datestr]: 0 },
+];
+const LATESTDATE = countDataArray[countDataArray.length - 1];
 
-//let lastItemIsCurrent = storedCount[storedCount.length-1]
+// If the current date str is in the array, grab it
+// let previousCountExists = datestr in LATESTDATE;
 
-/*  Use this when reliably able to get previous count.
-try {
-
-    if (storedCount.length === 0) {
-        console.log("DID NOT FIND PREVIOUS COUNT");
-       }
-    else {
-       let lastArrElement = storedCount[storedCount.length-1]
-       counter = lastArrElement[datestr]
-         }
-     }
-catch (error) { throw new Error("ERROR ON LOCALSTORAGE RETRIEVAL"); }
-
-*/
-
-// Set counter to zero if undefined or use updated counter number
-counter = counter == 0 || counter == undefined ? 0 : counter;
+if (LATESTDATE[datestr] > 0) {
+  counter = LATESTDATE[datestr];
+} else {
+  counter = 0;
+}
 
 let cbox = document.createElement("p"); // The actual counter element
 cbox.innerHTML = counter;
@@ -82,21 +68,26 @@ $(workingRow).append(subBtn);
 
 // Update the counter
 $("#save").on("click", function (e) {
-  cbox.innerHTML = ++counter;
+  cbox.innerHTML = ++LATESTDATE[datestr];
 });
 
 $(subBtn).on("click", function (e) {
-  storedCountArr.push({ datestr: counter });
-  localStorage.setItem("skedCount", JSON.stringify(storedCountArr));
+  if (datestr in LATESTDATE) {
+    // Just update the object value
+    LATESTDATE[datestr] = counter;
+  } else {
+    // Doesnt exist, so push it on the count array
+    countDataArray.push({ datestr: counter });
+  }
+
+  localStorage.setItem("skedCount", JSON.stringify(countData));
   cbox.innerHTML = --counter;
 });
 
 // Style the buttons
 $(subBtn).hover(
   function () {
-    $(this).css({
-      "background-color": "#ccbcbe",
-    });
+    $(this).css({ "background-color": "#ccbcbe" });
   },
   function () {
     $(this).css({ "background-color": "#dbd5d6" });
@@ -111,3 +102,8 @@ $(cbox).hover(
     $(this).css({ "font-weight": "400" });
   }
 );
+
+function updateStorage() {
+  // Decide on how/when to update the count
+  localStorage.setItem("skedCount", JSON.stringify(countData));
+}
