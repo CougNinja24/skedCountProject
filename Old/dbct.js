@@ -45,24 +45,24 @@ cbox.innerHTML = localStorage.dbct;
 $(cbox).addClass("counter");
 
 $(cbox).css({
-  float: "left",
-  backgroundColor: "beige",
-  paddingRight: "1px",
-  marginRight: "6px",
-  fontWeight: "300",
-  fontSize: "medium",
-  top: "3px",
-  position: "relative",
-  borderRadius: "5px",
+  "float": "left",
+  "backgroundColor": "beige",
+  "paddingRight": "1px",
+  "marginRight": "6px",
+  "fontWeight": "300",
+  "fontSize": "medium",
+  "top": "3px",
+  "position": "relative",
+  "borderRadius": "5px",
 });
 let subBtn = document.createElement("button");
 subBtn.innerText = "-";
 $(subBtn).css({
   "padding-left": "3px",
   "padding-right": "3px",
-  display: "inline",
+  "display": "inline",
   "border-width": "thin",
-  width: "20px",
+  "width": "20px",
   "box-sizing": "border-box",
   "border-radius": "3px",
 });
@@ -117,7 +117,7 @@ $(cbox).hover(
 );
 
 $("body > .container .ssPageTitle").css({
-  padding: "0px",
+  "padding": "0px",
   "margin-bottom": "4px",
 });
 $("#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(4)").css(
