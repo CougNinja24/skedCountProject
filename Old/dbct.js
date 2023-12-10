@@ -159,3 +159,21 @@ function updateStorage() {
 
 // Todo
 // Create a filter function to remove duplicate entries.
+function sortAndFilter(gamesArray) {
+  let sorted = gamesArray.toSorted((a, b) => {
+    if (a.count > b.count) {
+      return 1;
+    } else if (a.count < b.count) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+  // Remove on the same date
+  let filtered = sorted.filter((obj, idx) => {
+    return idx === sorted.findLastIndex((o) => o.date === createStorableDate());
+  });
+  // Should I add if statement for findLastIndex to make sure that at least one object always remains?
+
+  return filtered;
+}
