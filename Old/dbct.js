@@ -137,10 +137,9 @@ function updateStorage() {
   console.log("Updating Storage STARTING");
   let dstr = createStorableDate();
   console.log("dstr = ", dstr);
-  let storedArray = JSON.parse(localStorage.getItem("dbct_storage")) || [];
+  let arrayCopy = JSON.parse(localStorage.getItem("dbct_storage")) || [];
   // Try withouth shallow copy
   // let arrayCopy = [...storedArray];
-  let arrayCopy = storedArray;
   // End Try
   console.log(`Previous Games: ${arrayCopy}`);
 
@@ -157,3 +156,6 @@ function updateStorage() {
   console.log("Rewriting Now with", arrayCopy);
   localStorage.setItem("dbct_storage", JSON.stringify(arrayCopy));
 }
+
+// Todo
+// Create a filter function to remove duplicate entries.
