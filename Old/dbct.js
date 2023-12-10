@@ -14,12 +14,12 @@ console.log("dbct: ", localStorage.dbct);
 
 localStorage.dbct = localStorage.dbct || 0;
 localStorage.dbct_date = new Date().getDate();
-let counter = localStorage.dbct;
+
 // Check and coerce to string if needed
 // counter = (typeof counter === "number") ? counter : +counter
 // counter = isNumber(counter) ? counter : +counter
 
-let datestr = dateFormater();
+// let scriptRunDate = dateFormater();
 
 /*
 // Experimental
@@ -29,11 +29,11 @@ if (!localStorage.getItem("dbct_storage")) {
 else {
 	let stored = JSON.parse(localStorage.getItem("dbct_storage"))
 	lastObject = stored.at(-1)
-	if (lastObject["date"] !== datestr) {
+	if (lastObject["date"] !== scriptRunDate) {
 		counter = lastObject.count
 	}
 	data = [...stored];
-	data.push({ date: datestr, count:localStorage.dbct })
+	data.push({ date: scriptRunDate, count:localStorage.dbct })
 
 }
 
@@ -41,7 +41,7 @@ else {
 */
 
 let cbox = document.createElement("p"); // The actual counter element
-cbox.innerHTML = counter;
+cbox.innerHTML = localStorage.dbct;
 $(cbox).addClass("counter");
 
 $(cbox).css({
@@ -75,14 +75,12 @@ $(workingRow).append(cbox);
 $(workingRow).append(subBtn);
 
 $("#save").on("click", function (e) {
-  cbox.innerHTML = ++counter;
-  localStorage.dbct = counter;
+  cbox.innerHTML = ++localStorage.dbct;
 });
 
 $(subBtn).on("click", function (e) {
-  if (counter > 0) {
-    cbox.innerHTML = --counter;
-    localStorage.dbct = counter;
+  if (localStorage.dbct > 0) {
+    cbox.innerHTML = --localStorage.dbct;
   }
 });
 
@@ -93,9 +91,8 @@ $(subBtn).on("dblclick", function (e) {
     updateStorage();
     localStorage.dbct_date = today;
   }
-  counter = 0;
-  cbox.innerHTML = 0;
   localStorage.dbct = 0;
+  cbox.innerHTML = localStorage.dbct;
   console.log("Counter reset to 0");
 });
 
@@ -127,7 +124,7 @@ $("#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(4)").css(
   { "margin-top": "-12px" }
 );
 
-function dateFormater(shift = 0) {
+function createStorableDate(shift = 0) {
   let d1 = new Date();
   let d1str =
     ("0" + (d1.getMonth() + 1)).slice(-2) +
@@ -138,7 +135,7 @@ function dateFormater(shift = 0) {
 
 function updateStorage() {
   console.log("Updating Storage STARTING");
-  let dstr = dateFormater();
+  let dstr = createStorableDate();
   console.log("dstr = ", dstr);
   let storedArray = JSON.parse(localStorage.getItem("dbct_storage")) || [];
   // Try withouth shallow copy
