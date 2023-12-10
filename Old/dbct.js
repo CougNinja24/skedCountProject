@@ -9,106 +9,154 @@
 // @grant        none
 // ==/UserScript==
 
-const GC = JSON.parse(localStorage.getItem('DBCT')) || {};
-window.GC = GC;
-if (Object.keys(GC).length == 0) {
-    console.error(`Previous GC not found: ${GC}
-    Creating new Object `);
+let data;
+console.log("dbct: ", localStorage.dbct);
+
+localStorage.dbct = localStorage.dbct || 0;
+localStorage.dbct_date = new Date().getDate();
+let counter = localStorage.dbct;
+// Check and coerce to string if needed
+// counter = (typeof counter === "number") ? counter : +counter
+// counter = isNumber(counter) ? counter : +counter
+
+let datestr = dateFormater();
+
+/*
+// Experimental
+if (!localStorage.getItem("dbct_storage")) { 
+		localStorage.setItem("dbct_storage",JSON.stringify([])) 
+}
+else {
+	let stored = JSON.parse(localStorage.getItem("dbct_storage"))
+	lastObject = stored.at(-1)
+	if (lastObject["date"] !== datestr) {
+		counter = lastObject.count
+	}
+	data = [...stored];
+	data.push({ date: datestr, count:localStorage.dbct })
+
 }
 
-var counter = 0;
-let cbox = document.createElement('p'); // The actual counter element
+
+*/
+
+let cbox = document.createElement("p"); // The actual counter element
 cbox.innerHTML = counter;
-$(cbox).addClass('counter');
+$(cbox).addClass("counter");
 
 $(cbox).css({
-    "float": 'left',
-    "backgroundColor": 'beige',
-    "paddingRight": '1px',
-    "marginRight": '6px',
-    "fontWeight": '300',
-    "fontSize": 'medium',
-    "top": '3px',
-    "position": 'relative',
-    "borderRadius": '5px'
-})
-let subBtn = document.createElement('button')
-subBtn.innerText = "-"
+  float: "left",
+  backgroundColor: "beige",
+  paddingRight: "1px",
+  marginRight: "6px",
+  fontWeight: "300",
+  fontSize: "medium",
+  top: "3px",
+  position: "relative",
+  borderRadius: "5px",
+});
+let subBtn = document.createElement("button");
+subBtn.innerText = "-";
 $(subBtn).css({
-    "padding-left":"3px",
-    "padding-right":"3px",
-    "display":"inline",
-    "border-width":"thin",
-    "width":"20px",
-    "box-sizing":"border-box",
-    "border-radius": "3px"
-})
+  "padding-left": "3px",
+  "padding-right": "3px",
+  display: "inline",
+  "border-width": "thin",
+  width: "20px",
+  "box-sizing": "border-box",
+  "border-radius": "3px",
+});
 
 // Row where buttons will be appended
-let workingRow = $('#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(7) > div')
+let workingRow = $(
+  "#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(7) > div"
+);
 $(workingRow).append(cbox);
 $(workingRow).append(subBtn);
 
-$('#save').on('click', function(e){
-    cbox.innerHTML = ++counter
+$("#save").on("click", function (e) {
+  cbox.innerHTML = ++counter;
+  localStorage.dbct = counter;
 });
 
-$(subBtn).on('click',function(e){
-    if (counter > 0) {
-        cbox.innerHTML = --counter;
-    }
+$(subBtn).on("click", function (e) {
+  if (counter > 0) {
+    cbox.innerHTML = --counter;
+    localStorage.dbct = counter;
+  }
+});
+
+$(subBtn).on("dblclick", function (e) {
+  let today = new Date().getDate();
+  if (today !== localStorage.dbct_date) {
+    console.log(`storage updated`);
+    updateStorage();
+    localStorage.dbct_date = today;
+  }
+  counter = 0;
+  cbox.innerHTML = 0;
+  localStorage.dbct = 0;
+  console.log("Counter reset to 0");
 });
 
 $(subBtn).hover(
-    function(){
-        $(this).css({
-            "background-color":"#ccbcbe"})
-    },function(){
-        $(this).css(
-            {"background-color":"#dbd5d6"})
+  function () {
+    $(this).css({
+      "background-color": "#ccbcbe",
     });
-
-// WRITE TO LOCALSTORAGE
-$(subBtn).on('dblclick', writeToLS);
+  },
+  function () {
+    $(this).css({ "background-color": "#dbd5d6" });
+  }
+);
 
 $(cbox).hover(
-    function(){
-        $(this).css(
-            {"font-weight":"600"})
-    },function(){
-        $(this).css(
-            {"font-weight":"400"})
-    })
+  function () {
+    $(this).css({ "font-weight": "600" });
+  },
+  function () {
+    $(this).css({ "font-weight": "400" });
+  }
+);
 
+$("body > .container .ssPageTitle").css({
+  padding: "0px",
+  "margin-bottom": "4px",
+});
+$("#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(4)").css(
+  { "margin-top": "-12px" }
+);
 
-
-
-function writeToLS() {
-    const data = updateGC();
-    try {
-        localStorage.setItem('DBCT',JSON.stringify(data))
-        console.log(`Wrote ${updateGC()} to Storage`);
-    }
-    catch {
-        console.error('Failed write to LocalStorage');
-    }
+function dateFormater(shift = 0) {
+  let d1 = new Date();
+  let d1str =
+    ("0" + (d1.getMonth() + 1)).slice(-2) +
+    ("0" + (d1.getDate() + shift)).slice(-2) +
+    d1.getFullYear();
+  return d1str;
 }
 
-// Needs testing
-function updateGC(modify=true) {
-    const d = new Date();
-    let datestr = `${d.getMonth()+1}-${d.getDate()}`
-    let day = d.getDay()
-    var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    let day_actual = dayNames[day]
-    if (modify) {
-        GC[datestr] = { count : ($('p.counter').text() > 0) ? $('p.counter').text() : 0,  
-                      DOW:day_actual }
-        return GC
-    }
-    else {
-        console.log(`datestr: ${datestr} created
-                   GC[${datestr}]: ${GC[datestr]} `)
-    }
+function updateStorage() {
+  console.log("Updating Storage STARTING");
+  let dstr = dateFormater();
+  console.log("dstr = ", dstr);
+  let storedArray = JSON.parse(localStorage.getItem("dbct_storage")) || [];
+  // Try withouth shallow copy
+  // let arrayCopy = [...storedArray];
+  let arrayCopy = storedArray;
+  // End Try
+  console.log(`Previous Games: ${arrayCopy}`);
 
+  if (
+    arrayCopy.at(-1).date === dstr &&
+    arrayCopy.at(-1).count < localStorage.dbct
+  ) {
+    arrayCopy.at(-1).count = localStorage.dbct;
+  } else {
+    // No copy of current date found
+    // Add new date to the array
+    arrayCopy.push({ date: dstr, count: localStorage.dbct });
+  }
+  console.log("Rewriting Now with", arrayCopy);
+  localStorage.setItem("dbct_storage", JSON.stringify(arrayCopy));
 }
