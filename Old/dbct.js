@@ -84,16 +84,16 @@ $(subBtn).on("click", function (e) {
   }
 });
 
-$(subBtn).on("dblclick", function (e) {
-  let today = new Date().getDate();
-  if (today !== localStorage.dbct_date) {
-    console.log(`storage updated`);
+$(cbox).on("dblclick", function (e) {
+  if (confirm("Update Storage?")) {
     updateStorage();
-    localStorage.dbct_date = today;
+    console.log(`storage updated`);
   }
-  localStorage.dbct = 0;
-  cbox.innerHTML = localStorage.dbct;
-  console.log("Counter reset to 0");
+  if (confirm("Clear the Current Counter?")) {
+    localStorage.dbct = 0;
+    cbox.innerHTML = localStorage.dbct;
+    console.log("Counter reset to 0");
+  }
 });
 
 $(subBtn).hover(
