@@ -130,7 +130,8 @@ function createStorableDate(shift = 0) {
     ("0" + (d1.getMonth() + 1)).slice(-2) +
     ("0" + (d1.getDate() + shift)).slice(-2) +
     d1.getFullYear();
-  return d1str;
+  let confirmed = prompt("Enter Date to Store Game Count", d1str);
+  return confirmed;
 }
 
 function updateStorage() {
