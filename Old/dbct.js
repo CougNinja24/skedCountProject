@@ -124,7 +124,7 @@ $("#gameScheduler > div.card.withPadding.resetOverflow > div:nth-child(4)").css(
   { "margin-top": "-12px" }
 );
 
-function createStorableDate(shift = 0) {
+window.createStorableDate = function createStorableDate(shift = 0) {
   let d1 = new Date();
   let d1str =
     ("0" + (d1.getMonth() + 1)).slice(-2) +
@@ -132,7 +132,7 @@ function createStorableDate(shift = 0) {
     d1.getFullYear();
   let confirmed = prompt("Enter Date to Store Game Count", d1str);
   return confirmed;
-}
+};
 
 function updateStorage() {
   console.log("Updating Storage STARTING");
@@ -145,6 +145,7 @@ function updateStorage() {
   console.log(`Previous Games: ${arrayCopy}`);
 
   if (
+    // Previous game in storage, just update count and rewrite.
     arrayCopy.at(-1).date === dstr &&
     arrayCopy.at(-1).count < localStorage.dbct
   ) {
@@ -160,7 +161,7 @@ function updateStorage() {
 
 // Todo
 // Create a filter function to remove duplicate entries.
-function sortAndFilter(gamesArray) {
+window.sortAndFilter = function sortAndFilter(gamesArray) {
   let sorted = gamesArray.toSorted((a, b) => {
     if (a.count > b.count) {
       return 1;
@@ -177,4 +178,4 @@ function sortAndFilter(gamesArray) {
   // Should I add if statement for findLastIndex to make sure that at least one object always remains?
 
   return filtered;
-}
+};
