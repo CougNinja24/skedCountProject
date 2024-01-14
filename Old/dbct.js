@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SS Schedule Counter
 // @namespace    http://tampermonkey.net/
-// @version      1.3beta
+// @version      1.3.1
 // @description  To Count the # of Games built each day.
 // @author       Andy Lemberger
 // @match        https://scorestream.com/gameScheduler
@@ -21,24 +21,9 @@ localStorage.dbct_date = new Date().getDate();
 
 // let scriptRunDate = dateFormater();
 
-/*
 // Experimental
-if (!localStorage.getItem("dbct_storage")) { 
-		localStorage.setItem("dbct_storage",JSON.stringify([])) 
-}
-else {
-	let stored = JSON.parse(localStorage.getItem("dbct_storage"))
-	lastObject = stored.at(-1)
-	if (lastObject["date"] !== scriptRunDate) {
-		counter = lastObject.count
-	}
-	data = [...stored];
-	data.push({ date: scriptRunDate, count:localStorage.dbct })
-
-}
-
-
-*/
+// Write to clipboard
+// GM_setClipboard(localStorage.dbct_storage)
 
 let cbox = document.createElement("p"); // The actual counter element
 cbox.innerHTML = localStorage.dbct;
@@ -75,6 +60,7 @@ $(workingRow).append(cbox);
 $(workingRow).append(subBtn);
 
 $("#save").on("click", function (e) {
+  localStorage.dow = new Date().getDay(); // 0 - Sun, 6 - Sat.
   cbox.innerHTML = ++localStorage.dbct;
 });
 
@@ -86,6 +72,12 @@ $(subBtn).on("click", function (e) {
 
 $(cbox).on("dblclick", function (e) {
   if (confirm("Update Storage?")) {
+    localStorage.dow = prompt(
+      `Last Recorded Input on: ${localStorage.dow} 
+	enter correct day of week:
+	ex.. 0 = Sun, 2 = Tue, 4 = Thur, 6 = Sat`,
+      localStorage.dow
+    );
     updateStorage();
     console.log(`storage updated`);
   }
@@ -137,14 +129,17 @@ function createStorableDate(shift = 0) {
 function updateStorage() {
   console.log("Updating Storage STARTING");
   let dstr = createStorableDate();
-  console.log("dstr = ", dstr);
+  let dayofweek = localStorage.dow || new Date().getDay();
+
   let arrayCopy = JSON.parse(localStorage.getItem("dbct_storage")) || [];
-  // Try withouth shallow copy
-  // let arrayCopy = [...storedArray];
-  // End Try
-  console.log(`Previous Games: ${arrayCopy}`);
+
+  // Filter out null values.
+  if (arrayCopy.includes(null)) {
+    arrayCopy = arrayCopy.filter((o) => o?.date);
+  }
 
   if (
+    // Previous game in storage exists for today, just update count and rewrite.
     arrayCopy.at(-1).date === dstr &&
     arrayCopy.at(-1).count < localStorage.dbct
   ) {
@@ -152,12 +147,12 @@ function updateStorage() {
   } else {
     // No copy of current date found
     // Add new date to the array
-    arrayCopy.push({ date: dstr, count: localStorage.dbct });
+    arrayCopy.push({ date: dstr, dow: dayofweek, count: localStorage.dbct });
   }
+
   console.log("Rewriting Now with", arrayCopy);
   localStorage.setItem("dbct_storage", JSON.stringify(arrayCopy));
 }
-
 // Todo
 // Create a filter function to remove duplicate entries.
 function sortAndFilter(gamesArray) {
